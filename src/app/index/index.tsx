@@ -5,12 +5,13 @@ import { styles } from "./styles";
 
 import {services} from "@/services"
 
-import { Ingredient } from "@/components/ingredient";
-import React, { useState } from "react";
+import { Ingredient } from "@/components/Ingredient";
+import { useState } from "react";
 import { Selected } from "@/components/Selected";
 
 export default function Index() {
   const [selected, setSelected] = useState<string[]>([]);
+  const [ingredients, setIngredients] = useState<IngredientResponse[]>([])
 
   function handleToggleSelected(value: string) {
     if (selected.includes(value)) {
@@ -29,11 +30,11 @@ function handleClearSelected() {
 }
 
 function handleSearch() {
-  router.navigate("/recipes/")
+  router.navigate("/recipes/" + selected);
 }
 
 useEffect(() => {
-  
+  services.ingredients.findAll().then(setIngredients)
 }, [])
   
 
@@ -52,13 +53,13 @@ useEffect(() => {
         contentContainerStyle={styles.ingredients}
         showsVerticalScrollIndicator={false}
       >
-        {Array.from({ length: 100 }).map((item, index) => (
+        {ingredients.map((item) => (
           <Ingredient
-            key={index}
-            name="Maçã"
-            image=""
-            selected={selected.includes(String(index))}
-            onPress={() => handleToggleSelected(String(index))}
+            key={item.id}
+            name={item.name}
+            image={`${services.storage.imagePath}/${item.image}`}
+            selected={selected.includes(item.id)}
+            onPress={() => handleToggleSelected(item.id)}
           />
         ))}
       </ScrollView>
